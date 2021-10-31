@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "webots-web-log-interface"
-version = "0.1.0"
+version = "0.1.1"
 readme = "README.md"
 repository = "https://github.com/bit-bots/webots-web-log-interface"
 description = "A python library used to interact with webots robocup game web logs"
