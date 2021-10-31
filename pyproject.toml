@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "webots-web-log-interface"
+version = "0.1.0"
+description = "A python library used to interact with webots robocup game web logs"
+authors = ["Florian Vahl <florian@flova.de>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.7, <3.11"
+numpy = "^1.21.3"
+matplotlib = "^3.4.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
