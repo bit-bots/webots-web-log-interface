@@ -59,7 +59,7 @@ class WebotsGameLogParser:
         ax.set_ylim(-3, 3)
         ax.axis('equal')
         for bot in self.x3d.get_player_names():
-            ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_object_id(bot)).T[0:2])
+            ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_player_id(bot)).T[0:2])
         #ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_ball_id()).T[0:2], linewidth=5)
         plt.show()
 
@@ -215,27 +215,42 @@ class X3DParser:
         """
         return list(map(lambda x: x["name"], self.get_players()))
 
-    def get_object_id(self, name: str) -> int or None:
+    def get_player_id(self, name: str) -> int or None:
         """
-        The object id for a given name
+        Returns the object id for a given player name
         """
         return (list(map(lambda x: x["id"], filter(lambda x: x["name"] == name, self.get_players()))) + [None])[0]
+
+    @cache
+    def get_object_id(self, name: str) -> int or None:
+        """
+        Returns the object id for a object name
+        """
+        def equals_name(node: ET.Element) -> bool:
+            return node.attrib.get("name", "") == name
+
+        def simplify_to_id(node: ET.Element) -> id:
+            return int(node.attrib["id"][1:])
+
+        # Get all nodes from xml tree that match the name exactly
+        nodes_filtered_by_name = filter(equals_name, self.xml_root.iter("Transform"))
+
+        # Reduce them to their integer id
+        ids_from_filtered_nodes = map(simplify_to_id, nodes_filtered_by_name)
+
+        # Select the first candidate or None if there is no match
+        first_or_none = (list(ids_from_filtered_nodes) + [None])[0]
+
+        return first_or_none
 
     def get_player_ids(self) -> [int]:
         """
         Returns a list with all player object ids
         """
-        return list(map(self.get_object_id, self.get_player_names()))
+        return list(map(self.get_player_id, self.get_player_names()))
 
-    @cache
     def get_ball_id(self) -> int:
         """
         Returns the object id of the ball
         """
-        def is_ball(node: ET.Element) -> bool:
-            return "robocup soccer ball" == node.attrib.get("name", "")
-
-        def simplify(node: ET.Element) -> dict:
-            return int(node.attrib["id"][1:])
-
-        return simplify(next(filter(is_ball, self.xml_root.iter("Transform"))))
+        return self.get_object_id("robocup soccer ball")
