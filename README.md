@@ -7,16 +7,9 @@ A python library used to interact with webots robocup game web logs
 pip3 install webots-web-log-interface
 ```
 
+# Documentation
 
-## Build it yourself
-
-```bash
-git clone https://github.com/bit-bots/webots-web-log-interface.git
-cd webots-web-log-interface
-
-poetry install
-poetry shell
-```
+You can find the interface documentation [here](https://bit-bots.github.io/webots-web-log-interface/html/webots_web_log_interface/interface.html).
 
 ## Examples
 
@@ -46,4 +39,14 @@ print(gp.game_data.get_velocity_vectors_for_id(ball))
 print(gp.x3d.get_player_names())
 # Plot player paths
 gp.plot_player_paths()
+```
+
+## Build it yourself
+
+```bash
+git clone https://github.com/bit-bots/webots-web-log-interface.git
+cd webots-web-log-interface
+
+poetry install
+poetry shell
 ```
