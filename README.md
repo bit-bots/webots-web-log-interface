@@ -27,6 +27,7 @@ mkdir data
 cd data
 wget https://games.bit-bots.de/k-ko-sf2/K-KO-SF2.json
 wget https://games.bit-bots.de/k-ko-sf2/K-KO-SF2.x3d
+cd ..
 ```
 
 Now you are able to use the interface
@@ -34,7 +35,7 @@ Now you are able to use the interface
 ```python
 from webots_web_log_interface.interface import WebotsGameLogParser
 
-gp = WebotsGameLogParser("/home/<user>/data")
+gp = WebotsGameLogParser(log_folder="data")
 
 # Now some examples
 # Get ball
