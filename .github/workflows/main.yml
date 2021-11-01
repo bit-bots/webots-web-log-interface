@@ -1,0 +1,26 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install pdoc
+        run: pip install pdoc
+        
+      - name: Build docs
+        run: pdoc --html webots_web_log_interface
+      
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: html 
