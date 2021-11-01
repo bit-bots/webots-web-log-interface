@@ -134,6 +134,13 @@ class GameJsonParser:
         translations = list(map(lambda x: x["trans"], self.get_poses_for_id(id)))
         return np.array(translations, dtype=float)
 
+    def get_orientations_for_id(self, id: int) -> np.ndarray:
+        """
+        Returns an NumPy array with all orientations for an object (as axis angle)
+        """
+        translations = list(map(lambda x: x["rot"], self.get_poses_for_id(id)))
+        return np.array(translations, dtype=float)
+
     def get_timestamps_for_id(self, id: int) -> np.ndarray:
         """
         Returns an NumPy array with all timesteps for an object
