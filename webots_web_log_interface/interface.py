@@ -129,7 +129,7 @@ class GameJsonParser:
 
     def get_translations_for_id(self, id: int) -> np.ndarray:
         """
-        Returns an NumPy array with all translations for an object
+        Returns an NumPy array with all translations for an object (in meters)
         """
         translations = list(map(lambda x: x["trans"], self.get_poses_for_id(id)))
         return np.array(translations, dtype=float)
@@ -143,14 +143,14 @@ class GameJsonParser:
 
     def get_timestamps_for_id(self, id: int) -> np.ndarray:
         """
-        Returns an NumPy array with all timesteps for an object
+        Returns an NumPy array with all timesteps for an object (in seconds)
         """
         timesteps = list(map(lambda x: x["time"], self.get_poses_for_id(id)))
         return (np.array(timesteps, dtype=float) / 1000)
 
     def get_velocity_vectors_for_id(self, id: int):
         """
-        Calcs vel vecs for a given id
+        Calcs vel vecs for a given id (in m/s)
         """
         Δtrans = np.diff(self.get_translations_for_id(id), axis=0)
         Δtime = np.diff(self.get_timestamps_for_id(id))
@@ -158,7 +158,7 @@ class GameJsonParser:
 
     def get_velocities_for_id(self, id: int):
         """
-        Calcs vels for a given id
+        Calcs vels for a given id (in m/s)
         """
         return np.linalg.norm(self.get_velocity_vectors_for_id(id), axis=1)
 
