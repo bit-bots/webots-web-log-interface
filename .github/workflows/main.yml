@@ -13,8 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install pdoc
-        run: pip install pdoc
+      - name: Install pdoc3
+        run: pip install pdoc3
         
       - name: Build docs
         run: pdoc --html webots_web_log_interface
