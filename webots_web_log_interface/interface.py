@@ -3,7 +3,13 @@ import os
 import json
 import numpy as np
 import xml.etree.ElementTree as ET
-from functools import cache, cached_property
+
+from functools import cached_property, lru_cache
+# Fix for python < 3.9
+try:
+    from functools import cache
+except ImportError:
+    cache = lru_cache(maxsize=None)
 
 try:
     import matplotlib.pyplot as plt
