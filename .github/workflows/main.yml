@@ -12,12 +12,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install pdoc3
-        run: pip install pdoc3
+        
+      - name: Install poetry
+        run: pip install poetry
+        
+      - name: Install project deps
+        run: poetry install
         
       - name: Build docs
-        run: pdoc --html webots_web_log_interface
+        run: poetry run pdoc --html webots_web_log_interface
       
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.5
