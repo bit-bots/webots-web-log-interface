@@ -8,4 +8,4 @@ pip3 install webots-web-log-interface
 
 ## Docs
 
-You can find the dokumentation [here](webots-web-log-interface/html/webots_web_log_interface).
+You can find the dokumentation [here](html/webots_web_log_interface).
