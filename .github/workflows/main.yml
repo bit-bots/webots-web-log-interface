@@ -12,9 +12,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install pdoc3
-        run: pip install pdoc3
+        
+      - name: Install poetry
+        run: pip install poetry
+        
+      - name: Install project deps
+        run: poetry install
+        
+      - name: Open project shell
+        run: poetry shell
         
       - name: Build docs
         run: pdoc --html webots_web_log_interface
