@@ -7,7 +7,7 @@ A python library used to interact with webots robocup game web logs
 pip3 install webots-web-log-interface
 ```
 
-# Documentation
+## Documentation
 
 You can find the interface documentation [here](https://bit-bots.github.io/webots-web-log-interface/html/webots_web_log_interface/interface.html).
 
