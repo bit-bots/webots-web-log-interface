@@ -47,7 +47,8 @@ except ImportError:
 
 class WebotsGameLogParser:
     &#34;&#34;&#34;
-    All the gamelogs for a given game folder
+    The if the root class of the interface.
+    It connects both the x3d and json parser and offers some high level example plots.
     &#34;&#34;&#34;
     def __init__(self, log_folder: str, verbose=True):
         super().__init__()
@@ -587,14 +588,16 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
 <span>(</span><span>log_folder: str, verbose=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>All the gamelogs for a given game folder</p></div>
+<div class="desc"><p>The if the root class of the interface.
+It connects both the x3d and json parser and offers some high level example plots.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class WebotsGameLogParser:
     &#34;&#34;&#34;
-    All the gamelogs for a given game folder
+    The if the root class of the interface.
+    It connects both the x3d and json parser and offers some high level example plots.
     &#34;&#34;&#34;
     def __init__(self, log_folder: str, verbose=True):
         super().__init__()
