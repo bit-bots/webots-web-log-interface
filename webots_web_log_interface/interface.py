@@ -19,7 +19,8 @@ except ImportError:
 
 class WebotsGameLogParser:
     """
-    All the gamelogs for a given game folder
+    The if the root class of the interface.
+    It connects both the x3d and json parser and offers some high level example plots.
     """
     def __init__(self, log_folder: str, verbose=True):
         super().__init__()
