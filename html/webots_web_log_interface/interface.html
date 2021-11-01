@@ -87,7 +87,7 @@ class WebotsGameLogParser:
         ax.set_ylim(-3, 3)
         ax.axis(&#39;equal&#39;)
         for bot in self.x3d.get_player_names():
-            ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_object_id(bot)).T[0:2])
+            ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_player_id(bot)).T[0:2])
         #ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_ball_id()).T[0:2], linewidth=5)
         plt.show()
 
@@ -243,30 +243,45 @@ class X3DParser:
         &#34;&#34;&#34;
         return list(map(lambda x: x[&#34;name&#34;], self.get_players()))
 
-    def get_object_id(self, name: str) -&gt; int or None:
+    def get_player_id(self, name: str) -&gt; int or None:
         &#34;&#34;&#34;
-        The object id for a given name
+        Returns the object id for a given player name
         &#34;&#34;&#34;
         return (list(map(lambda x: x[&#34;id&#34;], filter(lambda x: x[&#34;name&#34;] == name, self.get_players()))) + [None])[0]
+
+    @cache
+    def get_object_id(self, name: str) -&gt; int or None:
+        &#34;&#34;&#34;
+        Returns the object id for a object name
+        &#34;&#34;&#34;
+        def equals_name(node: ET.Element) -&gt; bool:
+            return node.attrib.get(&#34;name&#34;, &#34;&#34;) == name
+
+        def simplify_to_id(node: ET.Element) -&gt; id:
+            return int(node.attrib[&#34;id&#34;][1:])
+
+        # Get all nodes from xml tree that match the name exactly
+        nodes_filtered_by_name = filter(equals_name, self.xml_root.iter(&#34;Transform&#34;))
+
+        # Reduce them to their integer id
+        ids_from_filtered_nodes = map(simplify_to_id, nodes_filtered_by_name)
+
+        # Select the first candidate or None if there is no match
+        first_or_none = (list(ids_from_filtered_nodes) + [None])[0]
+
+        return first_or_none
 
     def get_player_ids(self) -&gt; [int]:
         &#34;&#34;&#34;
         Returns a list with all player object ids
         &#34;&#34;&#34;
-        return list(map(self.get_object_id, self.get_player_names()))
+        return list(map(self.get_player_id, self.get_player_names()))
 
-    @cache
     def get_ball_id(self) -&gt; int:
         &#34;&#34;&#34;
         Returns the object id of the ball
         &#34;&#34;&#34;
-        def is_ball(node: ET.Element) -&gt; bool:
-            return &#34;robocup soccer ball&#34; == node.attrib.get(&#34;name&#34;, &#34;&#34;)
-
-        def simplify(node: ET.Element) -&gt; dict:
-            return int(node.attrib[&#34;id&#34;][1:])
-
-        return simplify(next(filter(is_ball, self.xml_root.iter(&#34;Transform&#34;))))</code></pre>
+        return self.get_object_id(&#34;robocup soccer ball&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -636,7 +651,7 @@ It connects both the x3d and json parser and offers some high level example plot
         ax.set_ylim(-3, 3)
         ax.axis(&#39;equal&#39;)
         for bot in self.x3d.get_player_names():
-            ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_object_id(bot)).T[0:2])
+            ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_player_id(bot)).T[0:2])
         #ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_ball_id()).T[0:2], linewidth=5)
         plt.show()
 
@@ -733,7 +748,7 @@ It connects both the x3d and json parser and offers some high level example plot
     ax.set_ylim(-3, 3)
     ax.axis(&#39;equal&#39;)
     for bot in self.x3d.get_player_names():
-        ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_object_id(bot)).T[0:2])
+        ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_player_id(bot)).T[0:2])
     #ax.plot(*self.game_data.get_translations_for_id(self.x3d.get_ball_id()).T[0:2], linewidth=5)
     plt.show()</code></pre>
 </details>
@@ -784,30 +799,45 @@ It connects both the x3d and json parser and offers some high level example plot
         &#34;&#34;&#34;
         return list(map(lambda x: x[&#34;name&#34;], self.get_players()))
 
-    def get_object_id(self, name: str) -&gt; int or None:
+    def get_player_id(self, name: str) -&gt; int or None:
         &#34;&#34;&#34;
-        The object id for a given name
+        Returns the object id for a given player name
         &#34;&#34;&#34;
         return (list(map(lambda x: x[&#34;id&#34;], filter(lambda x: x[&#34;name&#34;] == name, self.get_players()))) + [None])[0]
+
+    @cache
+    def get_object_id(self, name: str) -&gt; int or None:
+        &#34;&#34;&#34;
+        Returns the object id for a object name
+        &#34;&#34;&#34;
+        def equals_name(node: ET.Element) -&gt; bool:
+            return node.attrib.get(&#34;name&#34;, &#34;&#34;) == name
+
+        def simplify_to_id(node: ET.Element) -&gt; id:
+            return int(node.attrib[&#34;id&#34;][1:])
+
+        # Get all nodes from xml tree that match the name exactly
+        nodes_filtered_by_name = filter(equals_name, self.xml_root.iter(&#34;Transform&#34;))
+
+        # Reduce them to their integer id
+        ids_from_filtered_nodes = map(simplify_to_id, nodes_filtered_by_name)
+
+        # Select the first candidate or None if there is no match
+        first_or_none = (list(ids_from_filtered_nodes) + [None])[0]
+
+        return first_or_none
 
     def get_player_ids(self) -&gt; [int]:
         &#34;&#34;&#34;
         Returns a list with all player object ids
         &#34;&#34;&#34;
-        return list(map(self.get_object_id, self.get_player_names()))
+        return list(map(self.get_player_id, self.get_player_names()))
 
-    @cache
     def get_ball_id(self) -&gt; int:
         &#34;&#34;&#34;
         Returns the object id of the ball
         &#34;&#34;&#34;
-        def is_ball(node: ET.Element) -&gt; bool:
-            return &#34;robocup soccer ball&#34; == node.attrib.get(&#34;name&#34;, &#34;&#34;)
-
-        def simplify(node: ET.Element) -&gt; dict:
-            return int(node.attrib[&#34;id&#34;][1:])
-
-        return simplify(next(filter(is_ball, self.xml_root.iter(&#34;Transform&#34;))))</code></pre>
+        return self.get_object_id(&#34;robocup soccer ball&#34;)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -820,32 +850,57 @@ It connects both the x3d and json parser and offers some high level example plot
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@cache
-def get_ball_id(self) -&gt; int:
+<pre><code class="python">def get_ball_id(self) -&gt; int:
     &#34;&#34;&#34;
     Returns the object id of the ball
     &#34;&#34;&#34;
-    def is_ball(node: ET.Element) -&gt; bool:
-        return &#34;robocup soccer ball&#34; == node.attrib.get(&#34;name&#34;, &#34;&#34;)
-
-    def simplify(node: ET.Element) -&gt; dict:
-        return int(node.attrib[&#34;id&#34;][1:])
-
-    return simplify(next(filter(is_ball, self.xml_root.iter(&#34;Transform&#34;))))</code></pre>
+    return self.get_object_id(&#34;robocup soccer ball&#34;)</code></pre>
 </details>
 </dd>
 <dt id="webots_web_log_interface.interface.X3DParser.get_object_id"><code class="name flex">
 <span>def <span class="ident">get_object_id</span></span>(<span>self, name: str) ‑> int</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The object id for a given name</p></div>
+<div class="desc"><p>Returns the object id for a object name</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_object_id(self, name: str) -&gt; int or None:
+<pre><code class="python">@cache
+def get_object_id(self, name: str) -&gt; int or None:
     &#34;&#34;&#34;
-    The object id for a given name
+    Returns the object id for a object name
+    &#34;&#34;&#34;
+    def equals_name(node: ET.Element) -&gt; bool:
+        return node.attrib.get(&#34;name&#34;, &#34;&#34;) == name
+
+    def simplify_to_id(node: ET.Element) -&gt; id:
+        return int(node.attrib[&#34;id&#34;][1:])
+
+    # Get all nodes from xml tree that match the name exactly
+    nodes_filtered_by_name = filter(equals_name, self.xml_root.iter(&#34;Transform&#34;))
+
+    # Reduce them to their integer id
+    ids_from_filtered_nodes = map(simplify_to_id, nodes_filtered_by_name)
+
+    # Select the first candidate or None if there is no match
+    first_or_none = (list(ids_from_filtered_nodes) + [None])[0]
+
+    return first_or_none</code></pre>
+</details>
+</dd>
+<dt id="webots_web_log_interface.interface.X3DParser.get_player_id"><code class="name flex">
+<span>def <span class="ident">get_player_id</span></span>(<span>self, name: str) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the object id for a given player name</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_player_id(self, name: str) -&gt; int or None:
+    &#34;&#34;&#34;
+    Returns the object id for a given player name
     &#34;&#34;&#34;
     return (list(map(lambda x: x[&#34;id&#34;], filter(lambda x: x[&#34;name&#34;] == name, self.get_players()))) + [None])[0]</code></pre>
 </details>
@@ -863,7 +918,7 @@ def get_ball_id(self) -&gt; int:
     &#34;&#34;&#34;
     Returns a list with all player object ids
     &#34;&#34;&#34;
-    return list(map(self.get_object_id, self.get_player_names()))</code></pre>
+    return list(map(self.get_player_id, self.get_player_names()))</code></pre>
 </details>
 </dd>
 <dt id="webots_web_log_interface.interface.X3DParser.get_player_names"><code class="name flex">
@@ -948,9 +1003,10 @@ def get_players(self) -&gt; [dict]:
 </li>
 <li>
 <h4><code><a title="webots_web_log_interface.interface.X3DParser" href="#webots_web_log_interface.interface.X3DParser">X3DParser</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="webots_web_log_interface.interface.X3DParser.get_ball_id" href="#webots_web_log_interface.interface.X3DParser.get_ball_id">get_ball_id</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.X3DParser.get_object_id" href="#webots_web_log_interface.interface.X3DParser.get_object_id">get_object_id</a></code></li>
+<li><code><a title="webots_web_log_interface.interface.X3DParser.get_player_id" href="#webots_web_log_interface.interface.X3DParser.get_player_id">get_player_id</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.X3DParser.get_player_ids" href="#webots_web_log_interface.interface.X3DParser.get_player_ids">get_player_ids</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.X3DParser.get_player_names" href="#webots_web_log_interface.interface.X3DParser.get_player_names">get_player_names</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.X3DParser.get_players" href="#webots_web_log_interface.interface.X3DParser.get_players">get_players</a></code></li>
