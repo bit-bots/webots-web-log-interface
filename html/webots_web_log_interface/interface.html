@@ -157,21 +157,28 @@ class GameJsonParser:
 
     def get_translations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Returns an NumPy array with all translations for an object
+        Returns an NumPy array with all translations for an object (in meters)
         &#34;&#34;&#34;
         translations = list(map(lambda x: x[&#34;trans&#34;], self.get_poses_for_id(id)))
         return np.array(translations, dtype=float)
 
+    def get_orientations_for_id(self, id: int) -&gt; np.ndarray:
+        &#34;&#34;&#34;
+        Returns an NumPy array with all orientations for an object (as axis angle)
+        &#34;&#34;&#34;
+        translations = list(map(lambda x: x[&#34;rot&#34;], self.get_poses_for_id(id)))
+        return np.array(translations, dtype=float)
+
     def get_timestamps_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Returns an NumPy array with all timesteps for an object
+        Returns an NumPy array with all timesteps for an object (in seconds)
         &#34;&#34;&#34;
         timesteps = list(map(lambda x: x[&#34;time&#34;], self.get_poses_for_id(id)))
         return (np.array(timesteps, dtype=float) / 1000)
 
     def get_velocity_vectors_for_id(self, id: int):
         &#34;&#34;&#34;
-        Calcs vel vecs for a given id
+        Calcs vel vecs for a given id (in m/s)
         &#34;&#34;&#34;
         Δtrans = np.diff(self.get_translations_for_id(id), axis=0)
         Δtime = np.diff(self.get_timestamps_for_id(id))
@@ -179,7 +186,7 @@ class GameJsonParser:
 
     def get_velocities_for_id(self, id: int):
         &#34;&#34;&#34;
-        Calcs vels for a given id
+        Calcs vels for a given id (in m/s)
         &#34;&#34;&#34;
         return np.linalg.norm(self.get_velocity_vectors_for_id(id), axis=1)
 
@@ -353,21 +360,28 @@ class X3DParser:
 
     def get_translations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Returns an NumPy array with all translations for an object
+        Returns an NumPy array with all translations for an object (in meters)
         &#34;&#34;&#34;
         translations = list(map(lambda x: x[&#34;trans&#34;], self.get_poses_for_id(id)))
         return np.array(translations, dtype=float)
 
+    def get_orientations_for_id(self, id: int) -&gt; np.ndarray:
+        &#34;&#34;&#34;
+        Returns an NumPy array with all orientations for an object (as axis angle)
+        &#34;&#34;&#34;
+        translations = list(map(lambda x: x[&#34;rot&#34;], self.get_poses_for_id(id)))
+        return np.array(translations, dtype=float)
+
     def get_timestamps_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Returns an NumPy array with all timesteps for an object
+        Returns an NumPy array with all timesteps for an object (in seconds)
         &#34;&#34;&#34;
         timesteps = list(map(lambda x: x[&#34;time&#34;], self.get_poses_for_id(id)))
         return (np.array(timesteps, dtype=float) / 1000)
 
     def get_velocity_vectors_for_id(self, id: int):
         &#34;&#34;&#34;
-        Calcs vel vecs for a given id
+        Calcs vel vecs for a given id (in m/s)
         &#34;&#34;&#34;
         Δtrans = np.diff(self.get_translations_for_id(id), axis=0)
         Δtime = np.diff(self.get_timestamps_for_id(id))
@@ -375,7 +389,7 @@ class X3DParser:
 
     def get_velocities_for_id(self, id: int):
         &#34;&#34;&#34;
-        Calcs vels for a given id
+        Calcs vels for a given id (in m/s)
         &#34;&#34;&#34;
         return np.linalg.norm(self.get_velocity_vectors_for_id(id), axis=1)
 
@@ -493,6 +507,23 @@ class X3DParser:
     return inter</code></pre>
 </details>
 </dd>
+<dt id="webots_web_log_interface.interface.GameJsonParser.get_orientations_for_id"><code class="name flex">
+<span>def <span class="ident">get_orientations_for_id</span></span>(<span>self, id: int) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns an NumPy array with all orientations for an object (as axis angle)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_orientations_for_id(self, id: int) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Returns an NumPy array with all orientations for an object (as axis angle)
+    &#34;&#34;&#34;
+    translations = list(map(lambda x: x[&#34;rot&#34;], self.get_poses_for_id(id)))
+    return np.array(translations, dtype=float)</code></pre>
+</details>
+</dd>
 <dt id="webots_web_log_interface.interface.GameJsonParser.get_poses_for_id"><code class="name flex">
 <span>def <span class="ident">get_poses_for_id</span></span>(<span>self, id: int) ‑> [<class 'dict'>]</span>
 </code></dt>
@@ -532,14 +563,14 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
 <span>def <span class="ident">get_timestamps_for_id</span></span>(<span>self, id: int) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Returns an NumPy array with all timesteps for an object</p></div>
+<div class="desc"><p>Returns an NumPy array with all timesteps for an object (in seconds)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_timestamps_for_id(self, id: int) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    Returns an NumPy array with all timesteps for an object
+    Returns an NumPy array with all timesteps for an object (in seconds)
     &#34;&#34;&#34;
     timesteps = list(map(lambda x: x[&#34;time&#34;], self.get_poses_for_id(id)))
     return (np.array(timesteps, dtype=float) / 1000)</code></pre>
@@ -549,14 +580,14 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
 <span>def <span class="ident">get_translations_for_id</span></span>(<span>self, id: int) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Returns an NumPy array with all translations for an object</p></div>
+<div class="desc"><p>Returns an NumPy array with all translations for an object (in meters)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_translations_for_id(self, id: int) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    Returns an NumPy array with all translations for an object
+    Returns an NumPy array with all translations for an object (in meters)
     &#34;&#34;&#34;
     translations = list(map(lambda x: x[&#34;trans&#34;], self.get_poses_for_id(id)))
     return np.array(translations, dtype=float)</code></pre>
@@ -566,14 +597,14 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
 <span>def <span class="ident">get_velocities_for_id</span></span>(<span>self, id: int)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Calcs vels for a given id</p></div>
+<div class="desc"><p>Calcs vels for a given id (in m/s)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_velocities_for_id(self, id: int):
     &#34;&#34;&#34;
-    Calcs vels for a given id
+    Calcs vels for a given id (in m/s)
     &#34;&#34;&#34;
     return np.linalg.norm(self.get_velocity_vectors_for_id(id), axis=1)</code></pre>
 </details>
@@ -582,14 +613,14 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
 <span>def <span class="ident">get_velocity_vectors_for_id</span></span>(<span>self, id: int)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Calcs vel vecs for a given id</p></div>
+<div class="desc"><p>Calcs vel vecs for a given id (in m/s)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_velocity_vectors_for_id(self, id: int):
     &#34;&#34;&#34;
-    Calcs vel vecs for a given id
+    Calcs vel vecs for a given id (in m/s)
     &#34;&#34;&#34;
     Δtrans = np.diff(self.get_translations_for_id(id), axis=0)
     Δtime = np.diff(self.get_timestamps_for_id(id))
@@ -984,6 +1015,7 @@ def get_players(self) -&gt; [dict]:
 <ul class="">
 <li><code><a title="webots_web_log_interface.interface.GameJsonParser.cleanup_poses" href="#webots_web_log_interface.interface.GameJsonParser.cleanup_poses">cleanup_poses</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.GameJsonParser.get_interpolated_translations" href="#webots_web_log_interface.interface.GameJsonParser.get_interpolated_translations">get_interpolated_translations</a></code></li>
+<li><code><a title="webots_web_log_interface.interface.GameJsonParser.get_orientations_for_id" href="#webots_web_log_interface.interface.GameJsonParser.get_orientations_for_id">get_orientations_for_id</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.GameJsonParser.get_poses_for_id" href="#webots_web_log_interface.interface.GameJsonParser.get_poses_for_id">get_poses_for_id</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.GameJsonParser.get_time_step_size" href="#webots_web_log_interface.interface.GameJsonParser.get_time_step_size">get_time_step_size</a></code></li>
 <li><code><a title="webots_web_log_interface.interface.GameJsonParser.get_timestamps_for_id" href="#webots_web_log_interface.interface.GameJsonParser.get_timestamps_for_id">get_timestamps_for_id</a></code></li>
