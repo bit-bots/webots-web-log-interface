@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "webots-web-log-interface"
-version = "0.2.0"
+version = "0.2.1"
 readme = "README.md"
 homepage = "https://bit-bots.github.io/webots-web-log-interface"
 repository = "https://github.com/bit-bots/webots-web-log-interface"
