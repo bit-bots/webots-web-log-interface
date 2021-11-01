@@ -195,7 +195,7 @@ class X3DParser:
         self.xml_root = ET.fromstring(x3d_file_raw_content)
 
     @cache
-    def get_players(self) -> list[dict]:
+    def get_players(self) -> [dict]:
         """
         Get the names of the loaded players
         """
