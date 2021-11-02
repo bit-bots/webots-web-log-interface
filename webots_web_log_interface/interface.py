@@ -188,8 +188,30 @@ class GameJsonParser:
         # Create the array of query values
         x_steps = np.arange(start=start, stop=stop, step=step_size)
         # Interpolate for each axis
-        inter = np.stack([np.interp(x_steps, xp, fp[:, i]) for i in range(3)])
-        return inter
+        inter = np.vstack([np.interp(x_steps, xp, fp[:, i]) for i in range(3)])
+        return inter.T
+
+    def get_interpolated_orientations(self, id: int, start: float = None, stop: float = None, step_size: float = 0.1) -> np.ndarray:
+        """
+        Returns the orientation data interpolated to fit a given step size
+        """
+        # Get the data that should be interpolated
+        fp = self.get_orientations_for_id(id)
+        xp = self.get_timestamps_for_id(id)
+        # Add default values if necessary. Use the first and last timestep for the given id.
+        if start is None: start = xp[0]
+        if stop is None: stop = xp[-1]
+        # Create the array of query values
+        x_steps = np.arange(start=start, stop=stop, step=step_size)
+        # The orientation is in axes angles, so we need to split the angle in two components
+        sin_angles = np.sin(fp[:, 3])
+        cos_angles = np.cos(fp[:, 3])
+        fp = [fp[:, 0], fp[:, 1], fp[:, 2], sin_angles, cos_angles]
+        # Interpolate for each axis
+        inter = np.vstack([np.interp(x_steps, xp, fpe) for fpe in fp])
+        # Convert sin cos vector back to an single angle
+        inter[3] = np.arctan2(inter[3], inter[4])
+        return inter[:4].T
 
 
 class X3DParser:
