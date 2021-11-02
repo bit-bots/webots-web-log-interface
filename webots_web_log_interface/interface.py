@@ -4,6 +4,8 @@ import json
 import numpy as np
 import xml.etree.ElementTree as ET
 
+from typing import Dict
+
 from functools import cached_property, lru_cache
 # Fix for python < 3.9
 try:
@@ -104,7 +106,7 @@ class GameJsonParser:
         return np.array([float(num) for num in vec.split(" ")], dtype=float)
 
     @cache
-    def get_poses_for_id(self, id: int) -> [dict]:
+    def get_poses_for_id(self, id: int) -> Dict[str, np.ndarray]:
         """
         Gets all the pose data for an object and
         return a list of dicts containing the time and the pose.
@@ -125,28 +127,30 @@ class GameJsonParser:
                             "rot": rotation
                         })
                         break
-        return self.cleanup_poses(poses)
+        # Clean out of bounds poses
+        poses = self.cleanup_poses(poses)
+        # Map the list of dicts to a dict of ndarrays to save memory
+        poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+        return poses
 
     def get_translations_for_id(self, id: int) -> np.ndarray:
         """
         Returns an NumPy array with all translations for an object (in meters)
         """
-        translations = list(map(lambda x: x["trans"], self.get_poses_for_id(id)))
-        return np.array(translations, dtype=float)
+        return self.get_poses_for_id(id)["trans"]
 
     def get_orientations_for_id(self, id: int) -> np.ndarray:
         """
         Returns an NumPy array with all orientations for an object (as axis angle)
         """
-        translations = list(map(lambda x: x["rot"], self.get_poses_for_id(id)))
-        return np.array(translations, dtype=float)
+        return self.get_poses_for_id(id)["rot"]
 
     def get_timestamps_for_id(self, id: int) -> np.ndarray:
         """
         Returns an NumPy array with all timesteps for an object (in seconds)
         """
-        timesteps = list(map(lambda x: x["time"], self.get_poses_for_id(id)))
-        return (np.array(timesteps, dtype=float) / 1000)
+        # Get correct array and scale it to seconds
+        return self.get_poses_for_id(id)["time"] / 1000
 
     def get_velocity_vectors_for_id(self, id: int):
         """
