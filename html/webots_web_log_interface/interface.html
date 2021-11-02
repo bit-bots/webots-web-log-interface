@@ -32,6 +32,8 @@ import json
 import numpy as np
 import xml.etree.ElementTree as ET
 
+from typing import Dict
+
 from functools import cached_property, lru_cache
 # Fix for python &lt; 3.9
 try:
@@ -132,7 +134,7 @@ class GameJsonParser:
         return np.array([float(num) for num in vec.split(&#34; &#34;)], dtype=float)
 
     @cache
-    def get_poses_for_id(self, id: int) -&gt; [dict]:
+    def get_poses_for_id(self, id: int) -&gt; Dict[str, np.ndarray]:
         &#34;&#34;&#34;
         Gets all the pose data for an object and
         return a list of dicts containing the time and the pose.
@@ -153,28 +155,30 @@ class GameJsonParser:
                             &#34;rot&#34;: rotation
                         })
                         break
-        return self.cleanup_poses(poses)
+        # Clean out of bounds poses
+        poses = self.cleanup_poses(poses)
+        # Map the list of dicts to a dict of ndarrays to save memory
+        poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+        return poses
 
     def get_translations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
         Returns an NumPy array with all translations for an object (in meters)
         &#34;&#34;&#34;
-        translations = list(map(lambda x: x[&#34;trans&#34;], self.get_poses_for_id(id)))
-        return np.array(translations, dtype=float)
+        return self.get_poses_for_id(id)[&#34;trans&#34;]
 
     def get_orientations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
         Returns an NumPy array with all orientations for an object (as axis angle)
         &#34;&#34;&#34;
-        translations = list(map(lambda x: x[&#34;rot&#34;], self.get_poses_for_id(id)))
-        return np.array(translations, dtype=float)
+        return self.get_poses_for_id(id)[&#34;rot&#34;]
 
     def get_timestamps_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
         Returns an NumPy array with all timesteps for an object (in seconds)
         &#34;&#34;&#34;
-        timesteps = list(map(lambda x: x[&#34;time&#34;], self.get_poses_for_id(id)))
-        return (np.array(timesteps, dtype=float) / 1000)
+        # Get correct array and scale it to seconds
+        return self.get_poses_for_id(id)[&#34;time&#34;] / 1000
 
     def get_velocity_vectors_for_id(self, id: int):
         &#34;&#34;&#34;
@@ -335,7 +339,7 @@ class X3DParser:
         return np.array([float(num) for num in vec.split(&#34; &#34;)], dtype=float)
 
     @cache
-    def get_poses_for_id(self, id: int) -&gt; [dict]:
+    def get_poses_for_id(self, id: int) -&gt; Dict[str, np.ndarray]:
         &#34;&#34;&#34;
         Gets all the pose data for an object and
         return a list of dicts containing the time and the pose.
@@ -356,28 +360,30 @@ class X3DParser:
                             &#34;rot&#34;: rotation
                         })
                         break
-        return self.cleanup_poses(poses)
+        # Clean out of bounds poses
+        poses = self.cleanup_poses(poses)
+        # Map the list of dicts to a dict of ndarrays to save memory
+        poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+        return poses
 
     def get_translations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
         Returns an NumPy array with all translations for an object (in meters)
         &#34;&#34;&#34;
-        translations = list(map(lambda x: x[&#34;trans&#34;], self.get_poses_for_id(id)))
-        return np.array(translations, dtype=float)
+        return self.get_poses_for_id(id)[&#34;trans&#34;]
 
     def get_orientations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
         Returns an NumPy array with all orientations for an object (as axis angle)
         &#34;&#34;&#34;
-        translations = list(map(lambda x: x[&#34;rot&#34;], self.get_poses_for_id(id)))
-        return np.array(translations, dtype=float)
+        return self.get_poses_for_id(id)[&#34;rot&#34;]
 
     def get_timestamps_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
         Returns an NumPy array with all timesteps for an object (in seconds)
         &#34;&#34;&#34;
-        timesteps = list(map(lambda x: x[&#34;time&#34;], self.get_poses_for_id(id)))
-        return (np.array(timesteps, dtype=float) / 1000)
+        # Get correct array and scale it to seconds
+        return self.get_poses_for_id(id)[&#34;time&#34;] / 1000
 
     def get_velocity_vectors_for_id(self, id: int):
         &#34;&#34;&#34;
@@ -520,12 +526,11 @@ class X3DParser:
     &#34;&#34;&#34;
     Returns an NumPy array with all orientations for an object (as axis angle)
     &#34;&#34;&#34;
-    translations = list(map(lambda x: x[&#34;rot&#34;], self.get_poses_for_id(id)))
-    return np.array(translations, dtype=float)</code></pre>
+    return self.get_poses_for_id(id)[&#34;rot&#34;]</code></pre>
 </details>
 </dd>
 <dt id="webots_web_log_interface.interface.GameJsonParser.get_poses_for_id"><code class="name flex">
-<span>def <span class="ident">get_poses_for_id</span></span>(<span>self, id: int) ‑> [<class 'dict'>]</span>
+<span>def <span class="ident">get_poses_for_id</span></span>(<span>self, id: int) ‑> Dict[str, numpy.ndarray]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Gets all the pose data for an object and
@@ -535,7 +540,7 @@ return a list of dicts containing the time and the pose.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@cache
-def get_poses_for_id(self, id: int) -&gt; [dict]:
+def get_poses_for_id(self, id: int) -&gt; Dict[str, np.ndarray]:
     &#34;&#34;&#34;
     Gets all the pose data for an object and
     return a list of dicts containing the time and the pose.
@@ -556,7 +561,11 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
                         &#34;rot&#34;: rotation
                     })
                     break
-    return self.cleanup_poses(poses)</code></pre>
+    # Clean out of bounds poses
+    poses = self.cleanup_poses(poses)
+    # Map the list of dicts to a dict of ndarrays to save memory
+    poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+    return poses</code></pre>
 </details>
 </dd>
 <dt id="webots_web_log_interface.interface.GameJsonParser.get_timestamps_for_id"><code class="name flex">
@@ -572,8 +581,8 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
     &#34;&#34;&#34;
     Returns an NumPy array with all timesteps for an object (in seconds)
     &#34;&#34;&#34;
-    timesteps = list(map(lambda x: x[&#34;time&#34;], self.get_poses_for_id(id)))
-    return (np.array(timesteps, dtype=float) / 1000)</code></pre>
+    # Get correct array and scale it to seconds
+    return self.get_poses_for_id(id)[&#34;time&#34;] / 1000</code></pre>
 </details>
 </dd>
 <dt id="webots_web_log_interface.interface.GameJsonParser.get_translations_for_id"><code class="name flex">
@@ -589,8 +598,7 @@ def get_poses_for_id(self, id: int) -&gt; [dict]:
     &#34;&#34;&#34;
     Returns an NumPy array with all translations for an object (in meters)
     &#34;&#34;&#34;
-    translations = list(map(lambda x: x[&#34;trans&#34;], self.get_poses_for_id(id)))
-    return np.array(translations, dtype=float)</code></pre>
+    return self.get_poses_for_id(id)[&#34;trans&#34;]</code></pre>
 </details>
 </dd>
 <dt id="webots_web_log_interface.interface.GameJsonParser.get_velocities_for_id"><code class="name flex">
