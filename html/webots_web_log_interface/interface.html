@@ -34,7 +34,7 @@ import xml.etree.ElementTree as ET
 
 from typing import Dict
 
-from functools import cached_property, lru_cache
+from functools import lru_cache
 # Fix for python &lt; 3.9
 try:
     from functools import cache
@@ -120,7 +120,10 @@ class GameJsonParser:
         with open(self.jsonfile, &#34;r&#34;) as f:
             self.data = json.load(f)
 
-    @cached_property
+        # Cache poses for id
+        self._poses_for_id_cache = {}
+
+    @property
     def get_time_step_size(self) -&gt; int:
         &#34;&#34;&#34;
         Returns the basic time step in ms.
@@ -133,33 +136,34 @@ class GameJsonParser:
         &#34;&#34;&#34;
         return np.array([float(num) for num in vec.split(&#34; &#34;)], dtype=float)
 
-    @cache
     def get_poses_for_id(self, id: int) -&gt; Dict[str, np.ndarray]:
         &#34;&#34;&#34;
         Gets all the pose data for an object and
         return a list of dicts containing the time and the pose.
         &#34;&#34;&#34;
-        poses = []
-        for frame in self.data[&#34;frames&#34;]:
-            time = frame[&#34;time&#34;]
-            if &#34;poses&#34; in frame.keys():
-                for sim_object in frame[&#34;poses&#34;]:
-                    if sim_object[&#34;id&#34;] == id:
-                        if &#34;translation&#34; in sim_object.keys():
-                            translation = self._parse_str_vector(sim_object[&#34;translation&#34;])
-                        if &#34;rotation&#34; in sim_object.keys():
-                            rotation = self._parse_str_vector(sim_object[&#34;rotation&#34;])
-                        poses.append({
-                            &#34;time&#34;: time,
-                            &#34;trans&#34;: translation,
-                            &#34;rot&#34;: rotation
-                        })
-                        break
-        # Clean out of bounds poses
-        poses = self.cleanup_poses(poses)
-        # Map the list of dicts to a dict of ndarrays to save memory
-        poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
-        return poses
+        if not id in self._poses_for_id_cache.keys():
+            poses = []
+            for frame in self.data[&#34;frames&#34;]:
+                time = frame[&#34;time&#34;]
+                if &#34;poses&#34; in frame.keys():
+                    for sim_object in frame[&#34;poses&#34;]:
+                        if sim_object[&#34;id&#34;] == id:
+                            if &#34;translation&#34; in sim_object.keys():
+                                translation = self._parse_str_vector(sim_object[&#34;translation&#34;])
+                            if &#34;rotation&#34; in sim_object.keys():
+                                rotation = self._parse_str_vector(sim_object[&#34;rotation&#34;])
+                            poses.append({
+                                &#34;time&#34;: time,
+                                &#34;trans&#34;: translation,
+                                &#34;rot&#34;: rotation
+                            })
+                            break
+            # Clean out of bounds poses
+            poses = self.cleanup_poses(poses)
+            # Map the list of dicts to a dict of ndarrays to save memory
+            self._poses_for_id_cache[id] = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+
+        return self._poses_for_id_cache[id]
 
     def get_translations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
@@ -347,7 +351,10 @@ class X3DParser:
         with open(self.jsonfile, &#34;r&#34;) as f:
             self.data = json.load(f)
 
-    @cached_property
+        # Cache poses for id
+        self._poses_for_id_cache = {}
+
+    @property
     def get_time_step_size(self) -&gt; int:
         &#34;&#34;&#34;
         Returns the basic time step in ms.
@@ -360,33 +367,34 @@ class X3DParser:
         &#34;&#34;&#34;
         return np.array([float(num) for num in vec.split(&#34; &#34;)], dtype=float)
 
-    @cache
     def get_poses_for_id(self, id: int) -&gt; Dict[str, np.ndarray]:
         &#34;&#34;&#34;
         Gets all the pose data for an object and
         return a list of dicts containing the time and the pose.
         &#34;&#34;&#34;
-        poses = []
-        for frame in self.data[&#34;frames&#34;]:
-            time = frame[&#34;time&#34;]
-            if &#34;poses&#34; in frame.keys():
-                for sim_object in frame[&#34;poses&#34;]:
-                    if sim_object[&#34;id&#34;] == id:
-                        if &#34;translation&#34; in sim_object.keys():
-                            translation = self._parse_str_vector(sim_object[&#34;translation&#34;])
-                        if &#34;rotation&#34; in sim_object.keys():
-                            rotation = self._parse_str_vector(sim_object[&#34;rotation&#34;])
-                        poses.append({
-                            &#34;time&#34;: time,
-                            &#34;trans&#34;: translation,
-                            &#34;rot&#34;: rotation
-                        })
-                        break
-        # Clean out of bounds poses
-        poses = self.cleanup_poses(poses)
-        # Map the list of dicts to a dict of ndarrays to save memory
-        poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
-        return poses
+        if not id in self._poses_for_id_cache.keys():
+            poses = []
+            for frame in self.data[&#34;frames&#34;]:
+                time = frame[&#34;time&#34;]
+                if &#34;poses&#34; in frame.keys():
+                    for sim_object in frame[&#34;poses&#34;]:
+                        if sim_object[&#34;id&#34;] == id:
+                            if &#34;translation&#34; in sim_object.keys():
+                                translation = self._parse_str_vector(sim_object[&#34;translation&#34;])
+                            if &#34;rotation&#34; in sim_object.keys():
+                                rotation = self._parse_str_vector(sim_object[&#34;rotation&#34;])
+                            poses.append({
+                                &#34;time&#34;: time,
+                                &#34;trans&#34;: translation,
+                                &#34;rot&#34;: rotation
+                            })
+                            break
+            # Clean out of bounds poses
+            poses = self.cleanup_poses(poses)
+            # Map the list of dicts to a dict of ndarrays to save memory
+            self._poses_for_id_cache[id] = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+
+        return self._poses_for_id_cache[id]
 
     def get_translations_for_id(self, id: int) -&gt; np.ndarray:
         &#34;&#34;&#34;
@@ -470,43 +478,19 @@ class X3DParser:
 </details>
 <h3>Instance variables</h3>
 <dl>
-<dt id="webots_web_log_interface.interface.GameJsonParser.get_time_step_size"><code class="name">var <span class="ident">get_time_step_size</span></code></dt>
+<dt id="webots_web_log_interface.interface.GameJsonParser.get_time_step_size"><code class="name">var <span class="ident">get_time_step_size</span> : int</code></dt>
 <dd>
 <div class="desc"><p>Returns the basic time step in ms.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def __get__(self, instance, owner=None):
-    if instance is None:
-        return self
-    if self.attrname is None:
-        raise TypeError(
-            &#34;Cannot use cached_property instance without calling __set_name__ on it.&#34;)
-    try:
-        cache = instance.__dict__
-    except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
-        msg = (
-            f&#34;No &#39;__dict__&#39; attribute on {type(instance).__name__!r} &#34;
-            f&#34;instance to cache {self.attrname!r} property.&#34;
-        )
-        raise TypeError(msg) from None
-    val = cache.get(self.attrname, _NOT_FOUND)
-    if val is _NOT_FOUND:
-        with self.lock:
-            # check if another thread filled cache while we awaited lock
-            val = cache.get(self.attrname, _NOT_FOUND)
-            if val is _NOT_FOUND:
-                val = self.func(instance)
-                try:
-                    cache[self.attrname] = val
-                except TypeError:
-                    msg = (
-                        f&#34;The &#39;__dict__&#39; attribute on {type(instance).__name__!r} instance &#34;
-                        f&#34;does not support item assignment for caching {self.attrname!r} property.&#34;
-                    )
-                    raise TypeError(msg) from None
-    return val</code></pre>
+<pre><code class="python">@property
+def get_time_step_size(self) -&gt; int:
+    &#34;&#34;&#34;
+    Returns the basic time step in ms.
+    &#34;&#34;&#34;
+    return self.data[&#34;basicTimeStep&#34;]</code></pre>
 </details>
 </dd>
 </dl>
@@ -615,33 +599,34 @@ return a list of dicts containing the time and the pose.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@cache
-def get_poses_for_id(self, id: int) -&gt; Dict[str, np.ndarray]:
+<pre><code class="python">def get_poses_for_id(self, id: int) -&gt; Dict[str, np.ndarray]:
     &#34;&#34;&#34;
     Gets all the pose data for an object and
     return a list of dicts containing the time and the pose.
     &#34;&#34;&#34;
-    poses = []
-    for frame in self.data[&#34;frames&#34;]:
-        time = frame[&#34;time&#34;]
-        if &#34;poses&#34; in frame.keys():
-            for sim_object in frame[&#34;poses&#34;]:
-                if sim_object[&#34;id&#34;] == id:
-                    if &#34;translation&#34; in sim_object.keys():
-                        translation = self._parse_str_vector(sim_object[&#34;translation&#34;])
-                    if &#34;rotation&#34; in sim_object.keys():
-                        rotation = self._parse_str_vector(sim_object[&#34;rotation&#34;])
-                    poses.append({
-                        &#34;time&#34;: time,
-                        &#34;trans&#34;: translation,
-                        &#34;rot&#34;: rotation
-                    })
-                    break
-    # Clean out of bounds poses
-    poses = self.cleanup_poses(poses)
-    # Map the list of dicts to a dict of ndarrays to save memory
-    poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
-    return poses</code></pre>
+    if not id in self._poses_for_id_cache.keys():
+        poses = []
+        for frame in self.data[&#34;frames&#34;]:
+            time = frame[&#34;time&#34;]
+            if &#34;poses&#34; in frame.keys():
+                for sim_object in frame[&#34;poses&#34;]:
+                    if sim_object[&#34;id&#34;] == id:
+                        if &#34;translation&#34; in sim_object.keys():
+                            translation = self._parse_str_vector(sim_object[&#34;translation&#34;])
+                        if &#34;rotation&#34; in sim_object.keys():
+                            rotation = self._parse_str_vector(sim_object[&#34;rotation&#34;])
+                        poses.append({
+                            &#34;time&#34;: time,
+                            &#34;trans&#34;: translation,
+                            &#34;rot&#34;: rotation
+                        })
+                        break
+        # Clean out of bounds poses
+        poses = self.cleanup_poses(poses)
+        # Map the list of dicts to a dict of ndarrays to save memory
+        self._poses_for_id_cache[id] = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+
+    return self._poses_for_id_cache[id]</code></pre>
 </details>
 </dd>
 <dt id="webots_web_log_interface.interface.GameJsonParser.get_timestamps_for_id"><code class="name flex">
