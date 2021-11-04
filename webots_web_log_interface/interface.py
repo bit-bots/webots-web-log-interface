@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 from typing import Dict
 
-from functools import cached_property, lru_cache
+from functools import lru_cache
 # Fix for python < 3.9
 try:
     from functools import cache
@@ -92,7 +92,10 @@ class GameJsonParser:
         with open(self.jsonfile, "r") as f:
             self.data = json.load(f)
 
-    @cached_property
+        # Cache poses for id
+        self._poses_for_id_cache = {}
+
+    @property
     def get_time_step_size(self) -> int:
         """
         Returns the basic time step in ms.
@@ -105,33 +108,34 @@ class GameJsonParser:
         """
         return np.array([float(num) for num in vec.split(" ")], dtype=float)
 
-    @cache
     def get_poses_for_id(self, id: int) -> Dict[str, np.ndarray]:
         """
         Gets all the pose data for an object and
         return a list of dicts containing the time and the pose.
         """
-        poses = []
-        for frame in self.data["frames"]:
-            time = frame["time"]
-            if "poses" in frame.keys():
-                for sim_object in frame["poses"]:
-                    if sim_object["id"] == id:
-                        if "translation" in sim_object.keys():
-                            translation = self._parse_str_vector(sim_object["translation"])
-                        if "rotation" in sim_object.keys():
-                            rotation = self._parse_str_vector(sim_object["rotation"])
-                        poses.append({
-                            "time": time,
-                            "trans": translation,
-                            "rot": rotation
-                        })
-                        break
-        # Clean out of bounds poses
-        poses = self.cleanup_poses(poses)
-        # Map the list of dicts to a dict of ndarrays to save memory
-        poses = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
-        return poses
+        if not id in self._poses_for_id_cache.keys():
+            poses = []
+            for frame in self.data["frames"]:
+                time = frame["time"]
+                if "poses" in frame.keys():
+                    for sim_object in frame["poses"]:
+                        if sim_object["id"] == id:
+                            if "translation" in sim_object.keys():
+                                translation = self._parse_str_vector(sim_object["translation"])
+                            if "rotation" in sim_object.keys():
+                                rotation = self._parse_str_vector(sim_object["rotation"])
+                            poses.append({
+                                "time": time,
+                                "trans": translation,
+                                "rot": rotation
+                            })
+                            break
+            # Clean out of bounds poses
+            poses = self.cleanup_poses(poses)
+            # Map the list of dicts to a dict of ndarrays to save memory
+            self._poses_for_id_cache[id] = {key: np.array([p[key] for p in poses], dtype=float) for key in poses[0].keys()}
+
+        return self._poses_for_id_cache[id]
 
     def get_translations_for_id(self, id: int) -> np.ndarray:
         """
