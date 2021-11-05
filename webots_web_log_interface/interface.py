@@ -6,13 +6,6 @@ import xml.etree.ElementTree as ET
 
 from typing import Dict
 
-from functools import lru_cache
-# Fix for python < 3.9
-try:
-    from functools import cache
-except ImportError:
-    cache = lru_cache(maxsize=None)
-
 try:
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
@@ -232,7 +225,6 @@ class X3DParser:
 
         self.xml_root = ET.fromstring(x3d_file_raw_content)
 
-    @cache
     def get_players(self) -> [dict]:
         """
         Get the names of the loaded players
@@ -258,7 +250,6 @@ class X3DParser:
         """
         return (list(map(lambda x: x["id"], filter(lambda x: x["name"] == name, self.get_players()))) + [None])[0]
 
-    @cache
     def get_object_id(self, name: str) -> int or None:
         """
         Returns the object id for a object name
