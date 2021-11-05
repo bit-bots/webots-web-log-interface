@@ -34,13 +34,6 @@ import xml.etree.ElementTree as ET
 
 from typing import Dict
 
-from functools import lru_cache
-# Fix for python &lt; 3.9
-try:
-    from functools import cache
-except ImportError:
-    cache = lru_cache(maxsize=None)
-
 try:
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
@@ -260,7 +253,6 @@ class X3DParser:
 
         self.xml_root = ET.fromstring(x3d_file_raw_content)
 
-    @cache
     def get_players(self) -&gt; [dict]:
         &#34;&#34;&#34;
         Get the names of the loaded players
@@ -286,7 +278,6 @@ class X3DParser:
         &#34;&#34;&#34;
         return (list(map(lambda x: x[&#34;id&#34;], filter(lambda x: x[&#34;name&#34;] == name, self.get_players()))) + [None])[0]
 
-    @cache
     def get_object_id(self, name: str) -&gt; int or None:
         &#34;&#34;&#34;
         Returns the object id for a object name
@@ -879,7 +870,6 @@ It connects both the x3d and json parser and offers some high level example plot
 
         self.xml_root = ET.fromstring(x3d_file_raw_content)
 
-    @cache
     def get_players(self) -&gt; [dict]:
         &#34;&#34;&#34;
         Get the names of the loaded players
@@ -905,7 +895,6 @@ It connects both the x3d and json parser and offers some high level example plot
         &#34;&#34;&#34;
         return (list(map(lambda x: x[&#34;id&#34;], filter(lambda x: x[&#34;name&#34;] == name, self.get_players()))) + [None])[0]
 
-    @cache
     def get_object_id(self, name: str) -&gt; int or None:
         &#34;&#34;&#34;
         Returns the object id for a object name
@@ -966,8 +955,7 @@ It connects both the x3d and json parser and offers some high level example plot
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@cache
-def get_object_id(self, name: str) -&gt; int or None:
+<pre><code class="python">def get_object_id(self, name: str) -&gt; int or None:
     &#34;&#34;&#34;
     Returns the object id for a object name
     &#34;&#34;&#34;
@@ -1046,8 +1034,7 @@ def get_object_id(self, name: str) -&gt; int or None:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@cache
-def get_players(self) -&gt; [dict]:
+<pre><code class="python">def get_players(self) -&gt; [dict]:
     &#34;&#34;&#34;
     Get the names of the loaded players
     &#34;&#34;&#34;
